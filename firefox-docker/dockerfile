@@ -1,0 +1,41 @@
+# Use an official Ubuntu as a parent image
+FROM ubuntu:latest
+
+# Set the working directory in the container to /app
+WORKDIR /app
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    x11vnc \
+    xvfb \
+    xterm \
+    wget \
+    x11-utils \
+    libdbus-glib-1-2 \
+    libxt6 \
+    bzip2 \
+    libgtk-3-0 \
+    libasound2 \
+    --no-install-recommends
+
+# Download Firefox
+RUN wget --no-check-certificate https://download-installer.cdn.mozilla.net/pub/firefox/releases/89.0/linux-x86_64/en-US/firefox-89.0.tar.bz2
+
+# Extract Firefox
+RUN tar xjf firefox-89.0.tar.bz2
+
+# Move Firefox
+RUN mv firefox /opt/firefox
+
+# Make Firefox available in PATH
+RUN ln -s /opt/firefox/firefox /usr/bin/firefox
+
+# Make port 5900 available to the world outside this container
+EXPOSE 5900
+
+# Run the following commands as part of the container start
+ADD startup.sh /app/
+
+RUN chmod +x /app/startup.sh
+
+CMD ["/app/startup.sh"]
